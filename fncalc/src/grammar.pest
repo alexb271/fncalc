@@ -1,0 +1,67 @@
+WHITESPACE = _{ " " | "\t" | NEWLINE }
+COMMENT = _{ ("/*" ~ (!"*/" ~ ANY)* ~ "*/") | ("//" ~ (!NEWLINE ~ ANY)* ~ NEWLINE) }
+
+start_symbol = { SOI ~  (instruction | function_definition)* ~ EOI }
+
+function_definition = { "fn" ~ identifier ~ "(" ~ (identifier ~ ("," ~ identifier)*)* ~")" ~ "{" ~ instruction* ~"}"}
+
+instruction = _{ expression | branch | while_loop | loop_break | function_return | print }
+expression = { operand ~ (binary_operator ~ operand)* ~ ";"? }
+branch = { "if" ~ expression ~ "{" ~ instruction* ~ "}" ~ branch_else? }
+branch_else = { "else" ~ "{" ~ instruction* ~ "}" }
+while_loop = { "while" ~ expression ~ "{" ~ instruction* ~ "}" }
+
+operand = _{ unary_operator* ~ (number | pi | function_call | identifier) | unary_operator* ~ left_par ~ expression ~ right_par }
+number = @{ ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? }
+identifier = @{ !keyword ~ (ASCII_ALPHA | "_") ~ (ASCII_ALPHA | ASCII_DIGIT | "_")* }
+function_call = { identifier ~ "(" ~ (expression ~ ("," ~ expression)*)* ~ ")" }
+
+keyword = _{ "if" | "else" | "while" | "break" | "fn" | "return" | "print" | "not" | "and" | "or" | "pi" |
+             "sin" | "sind" | "asin" | "asind" | "cos" | "cosd" | "acos" | "acosd" | "tan" | "tand" | "atan" | "atand" |
+             "ln" | "log" | "abs" }
+
+loop_break = @{ "break" }
+function_return = { "return" ~ expression }
+print = { "print" ~ expression }
+pi = @{ "pi" }
+
+binary_operator = _{ add | sub | mul | div | modulo | pow | and | or | less_than | greater_than | equal | not_equal | assign}
+add = @{ "+" }
+sub = @{ "-" }
+mul = @{ "*" }
+div = @{ "/" }
+modulo = @{ "%" }
+pow = @{ "^" }
+and = @{ "and" }
+or = @{ "or" }
+less_than = @{ "<" }
+greater_than = @{ ">" }
+equal = @{ "==" }
+not_equal = @{ "!=" }
+assign = @{ "=" }
+
+unary_operator = _{ neg | not | sind | sin | asind | asin | cosd | cos | acosd | acos | tand | tan | atand | atan | ln | log | abs }
+neg = @{ "-" }
+not = @{ "not" }
+
+sind = @{ "sind" }
+sin = @{ "sin" }
+asind = @{ "asind" }
+asin = @{ "asin" }
+
+cosd = @{ "cosd" }
+cos = @{ "cos" }
+acosd = @{ "acosd" }
+acos = @{ "acos" }
+
+tand = @{ "tand" }
+tan = @{ "tan" }
+atand = @{ "atand" }
+atan = @{ "atan" }
+
+ln = @{ "ln" }
+log = @{ "log" }
+abs = @{ "abs" }
+
+left_par = @{ "(" }
+right_par = @{ ")" }
